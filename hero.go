@@ -1,6 +1,8 @@
 package main
 
-import tcell "github.com/gdamore/tcell/v2"
+import (
+	tcell "github.com/gdamore/tcell/v2"
+)
 
 const HeroEmoji rune = '\U0001F9B8' // 🦸‍♂️
 

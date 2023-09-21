@@ -74,11 +74,26 @@ func main() {
 				s.Clear()
 			}
 		case *tcell.EventMouse:
-			x, y := ev.Position()
+			clickedX, clickedY := ev.Position()
 
 			switch ev.Buttons() {
 			case tcell.Button1, tcell.Button2:
-				s.SetContent(x, y, '💥', nil, defStyle)
+				finalX, finalY := calculateFinalPosition(xmax, ymax, hero.x, hero.y, makePositive(clickedX-hero.x), makePositive(clickedY-hero.y), calculateDirection(clickedX-hero.x, clickedY-hero.y))
+
+				bomb := Bomb{
+					currentX:  hero.x,
+					currentY:  hero.y,
+					distanceX: makePositive(finalX - hero.x),
+					distanceY: makePositive(finalY - hero.y),
+					direction: calculateDirection(clickedX-hero.x, clickedY-hero.y),
+					speed:     1,
+					initialX:  hero.x,
+					initialY:  hero.y,
+					finalX:    finalX,
+					finalY:    finalY,
+				}
+
+				bomb.draw(s, defStyle)
 			}
 		}
 

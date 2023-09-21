@@ -1,0 +1,2 @@
+- Change the final destination algorithm it is always taking to consideration the smallest possible path (y) that's why
+  we always end up with the same bomb direction
