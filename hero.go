@@ -5,9 +5,10 @@ import tcell "github.com/gdamore/tcell/v2"
 const HeroEmoji rune = '\U0001F9B8' // 🦸‍♂️
 
 type Hero struct {
-	x     int
-	y     int
-	speed uint8
+	x       int
+	y       int
+	speed   uint8
+	bullets []Bullet
 }
 
 func (h *Hero) goRight(maxWidth int) {
@@ -36,4 +37,5 @@ func (h *Hero) goDown(maxHeight int) {
 
 func (h *Hero) draw(s tcell.Screen, style tcell.Style) {
 	s.SetContent(h.x, h.y, HeroEmoji, nil, style)
+
 }

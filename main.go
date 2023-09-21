@@ -8,6 +8,7 @@ import (
 
 func main() {
 	defStyle := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
+	bulletStyle := tcell.StyleDefault.Background(tcell.ColorWheat).Foreground(tcell.ColorWhite)
 
 	// Initialize screen
 	s, err := tcell.NewScreen()
@@ -78,10 +79,23 @@ func main() {
 
 			switch ev.Buttons() {
 			case tcell.Button1, tcell.Button2:
-				s.SetContent(x, y, '💥', nil, defStyle)
+				bullet := Bullet{
+					x1:       hero.x,
+					y1:       hero.y,
+					x2:       x,
+					y2:       y,
+					currentX: hero.x,
+					currentY: hero.y,
+					speed:    3,
+				}
+				bullet.setBulletRune()
+				hero.bullets = append(hero.bullets, bullet)
 			}
 		}
 
 		hero.draw(s, defStyle)
+		for _, bullet := range hero.bullets {
+			bullet.draw(s, bulletStyle)
+		}
 	}
 }
