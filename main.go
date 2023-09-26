@@ -78,7 +78,7 @@ func main() {
 
 			switch ev.Buttons() {
 			case tcell.Button1, tcell.Button2:
-				finalX, finalY := calculateFinalPosition(xmax, ymax, hero.x, hero.y, makePositive(clickedX-hero.x), makePositive(clickedY-hero.y), calculateDirection(clickedX-hero.x, clickedY-hero.y))
+				finalX, finalY := clickedX, clickedY
 
 				bomb := Bomb{
 					currentX:  hero.x,

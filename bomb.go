@@ -72,6 +72,7 @@ func calculateDirection(xDifference, yDifference int) Direction {
 	}
 }
 
+// will be used later when we add options to the game (non-stop bombs options for exp)
 func calculateFinalPosition(maxX, maxY, currentX, currentY, distanceX, distanceY int, direction Direction) (int, int) {
 	switch true {
 	case direction == TOP:
@@ -138,7 +139,7 @@ func (b *Bomb) calculateDonePercent(verticalDirection VerticalDirection) {
 		takenDistance := (b.currentX - b.initialX) * -1
 		b.xDonePercent = float32(takenDistance) / float32(b.distanceX)
 		return
-	} else {
+	} else if verticalDirection == Y {
 		// do not exceed the finalY
 		if b.yDonePercent >= 1 {
 			return
@@ -147,13 +148,13 @@ func (b *Bomb) calculateDonePercent(verticalDirection VerticalDirection) {
 		// calculate yDonePercent for TOP
 		if b.direction == TOP || b.direction == TOPRIGHT || b.direction == TOPLEFT {
 			takenDistance := (b.currentY - b.initialY) * -1
-			b.yDonePercent = float32(takenDistance) / float32(b.distanceX)
+			b.yDonePercent = float32(takenDistance) / float32(b.distanceY)
 			return
 		}
 
 		// calculate yDonePercent for BOTTOM
 		takenDistance := b.currentY - b.initialY
-		b.yDonePercent = float32(takenDistance) / float32(b.distanceX)
+		b.yDonePercent = float32(takenDistance) / float32(b.distanceY)
 		return
 	}
 }
@@ -181,8 +182,12 @@ func (b *Bomb) move() {
 		return
 	}
 
+	if b.xDonePercent >= 1 && b.yDonePercent >= 1 {
+		return
+	}
+
 	// Move in X direction
-	if b.yDonePercent > b.xDonePercent {
+	if b.yDonePercent >= b.xDonePercent {
 		if b.direction == RIGHT || b.direction == BOTTOMRIGHT || b.direction == TOPRIGHT {
 			b.currentX++
 			b.calculateDonePercent(X)
@@ -191,7 +196,7 @@ func (b *Bomb) move() {
 			b.calculateDonePercent(X)
 		}
 		return
-	} else {
+	} else if b.xDonePercent > b.yDonePercent {
 		// Move in Y direction
 		if b.direction == TOP || b.direction == TOPRIGHT || b.direction == TOPLEFT {
 			b.currentY--
