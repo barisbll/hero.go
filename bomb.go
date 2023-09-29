@@ -26,6 +26,7 @@ const (
 )
 
 const BombEmoji rune = '💣'
+const ExplosionEmoji rune = '💥'
 
 type Coordinates struct {
 	x int
@@ -45,6 +46,8 @@ type Bomb struct {
 	finalX            int
 	finalY            int
 	lastDrawnPosition Coordinates
+	explodeIn         time.Duration
+	isDead            bool
 
 	speed uint
 }
@@ -100,6 +103,15 @@ func calculateFinalPosition(maxX, maxY, currentX, currentY, distanceX, distanceY
 func (b *Bomb) draw(s tcell.Screen, style tcell.Style) {
 	ticker := time.NewTicker(20 * time.Millisecond)
 	quit := make(chan struct{})
+	explosionComplete := make(chan struct{})
+	go func() {
+		time.Sleep(b.explodeIn)
+		b.isDead = true
+		close(quit)
+		time.Sleep(1 * time.Second)
+		close(explosionComplete)
+	}()
+
 	go func() {
 		for {
 			select {
@@ -107,18 +119,34 @@ func (b *Bomb) draw(s tcell.Screen, style tcell.Style) {
 				if b.lastDrawnPosition.x != 0 && b.lastDrawnPosition.y != 0 {
 					s.SetContent(b.lastDrawnPosition.x, b.lastDrawnPosition.y, ' ', nil, style)
 				}
-				s.SetContent(b.currentX, b.currentY, BombEmoji, nil, style)
-				b.lastDrawnPosition.x = b.currentX
-				b.lastDrawnPosition.y = b.currentY
+				if !b.isDead {
+					s.SetContent(b.currentX, b.currentY, BombEmoji, nil, style)
+					b.lastDrawnPosition.x = b.currentX
+					b.lastDrawnPosition.y = b.currentY
+					b.move()
+				} else {
+					s.SetContent(b.currentX, b.currentY, ExplosionEmoji, nil, style)
+				}
 
 				s.Show()
-				b.move()
 			case <-quit:
+				s.SetContent(b.currentX, b.currentY, ExplosionEmoji, nil, style)
+				b.lastDrawnPosition.x = b.currentX
+				b.lastDrawnPosition.y = b.currentY
+			case <-explosionComplete:
+				s.SetContent(b.currentX, b.currentY, ' ', nil, style)
+				s.Show()
 				ticker.Stop()
 				return
 			}
+
 		}
 	}()
+}
+
+func (b *Bomb) killAnd(chan struct{}) {
+	time.Sleep(b.explodeIn)
+
 }
 
 func (b *Bomb) calculateDonePercent(verticalDirection VerticalDirection) {

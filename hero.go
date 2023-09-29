@@ -10,6 +10,7 @@ type Hero struct {
 	x     int
 	y     int
 	speed uint8
+	bombs []Bomb
 }
 
 func (h *Hero) goRight(maxWidth int) {

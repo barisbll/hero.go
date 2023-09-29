@@ -1,2 +1,1 @@
-- Completely remove mouse events and make the character throw the bombs only in 4 directions, because of chars length difference
-it is really hard to calculate correct angle for the bomb throw. So I decided to make it only in 4 directions.
+Make the number of bomb limited with 5 and make it available when other bombs explode 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	tcell "github.com/gdamore/tcell/v2"
 )
@@ -91,8 +92,11 @@ func main() {
 					initialY:  hero.y,
 					finalX:    finalX,
 					finalY:    finalY,
+					explodeIn: time.Second * 1,
+					isDead:    false,
 				}
 
+				hero.bombs = append(hero.bombs, bomb)
 				bomb.draw(s, defStyle)
 			}
 		}
