@@ -13,5 +13,6 @@ go run .
 
 And enjoy the game 😊
 
-https://github.com/barisbll/cli-shooter/assets/40062673/1f07cacc-1acb-4565-a918-8e28bae8f389
+https://github.com/barisbll/cli-shooter/assets/40062673/06da61d7-2eb5-4d06-bfb2-8c363f862c21
+
 
