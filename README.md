@@ -1,4 +1,4 @@
-# cli-shooter
+# hero.go
 A first person shooter game on console, built with Go 💙
 
 To play it clone the project
@@ -13,6 +13,7 @@ go run .
 
 And enjoy the game 😊
 
-https://github.com/barisbll/cli-shooter/assets/40062673/06da61d7-2eb5-4d06-bfb2-8c363f862c21
+![hero go](https://github.com/barisbll/hero.go/assets/40062673/6bdcac5d-2685-4401-aab4-249d23b7aa46)
+
 
 
