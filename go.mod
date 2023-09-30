@@ -1,4 +1,4 @@
-module github.com/barisbll/cli-shooter
+module github.com/barisbll/hero-go
 
 go 1.20
 
