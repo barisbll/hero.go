@@ -23,7 +23,7 @@ func main() {
 	s.Clear()
 	xmax, ymax := s.Size()
 
-	hero := Hero{x: xmax / 2, y: ymax / 2, speed: 1}
+	hero := Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false}
 
 	hero.draw(s, defStyle)
 
@@ -58,6 +58,9 @@ func main() {
 				return
 			} else if ev.Key() == tcell.KeyCtrlL {
 				s.Sync()
+			} else if ev.Rune() == 'R' || ev.Rune() == 'r' {
+				hero = Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false}
+				s.Clear()
 			} else if ev.Rune() == 'C' || ev.Rune() == 'c' {
 				s.Clear()
 			} else if ev.Key() == tcell.KeyRight || ev.Rune() == 'D' || ev.Rune() == 'd' {
