@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"time"
 
 	tcell "github.com/gdamore/tcell/v2"
 )
@@ -79,25 +78,7 @@ func main() {
 
 			switch ev.Buttons() {
 			case tcell.Button1, tcell.Button2:
-				finalX, finalY := clickedX, clickedY
-
-				bomb := Bomb{
-					currentX:  hero.x,
-					currentY:  hero.y,
-					distanceX: makePositive(finalX - hero.x),
-					distanceY: makePositive(finalY - hero.y),
-					direction: calculateDirection(clickedX-hero.x, clickedY-hero.y),
-					speed:     1,
-					initialX:  hero.x,
-					initialY:  hero.y,
-					finalX:    finalX,
-					finalY:    finalY,
-					explodeIn: time.Second * 1,
-					isDead:    false,
-				}
-
-				hero.bombs = append(hero.bombs, bomb)
-				bomb.draw(s, defStyle)
+				hero.addBomb(s, defStyle, clickedX, clickedY)
 			}
 		}
 

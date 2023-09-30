@@ -34,6 +34,7 @@ type Coordinates struct {
 }
 
 type Bomb struct {
+	bombId            int
 	currentX          int
 	currentY          int
 	distanceX         int
@@ -102,12 +103,12 @@ func calculateFinalPosition(maxX, maxY, currentX, currentY, distanceX, distanceY
 
 func (b *Bomb) draw(s tcell.Screen, style tcell.Style) {
 	ticker := time.NewTicker(20 * time.Millisecond)
-	quit := make(chan struct{})
+	bombExploded := make(chan struct{})
 	explosionComplete := make(chan struct{})
 	go func() {
 		time.Sleep(b.explodeIn)
 		b.isDead = true
-		close(quit)
+		close(bombExploded)
 		time.Sleep(1 * time.Second)
 		close(explosionComplete)
 	}()
@@ -129,7 +130,7 @@ func (b *Bomb) draw(s tcell.Screen, style tcell.Style) {
 				}
 
 				s.Show()
-			case <-quit:
+			case <-bombExploded:
 				s.SetContent(b.currentX, b.currentY, ExplosionEmoji, nil, style)
 				b.lastDrawnPosition.x = b.currentX
 				b.lastDrawnPosition.y = b.currentY
@@ -142,11 +143,6 @@ func (b *Bomb) draw(s tcell.Screen, style tcell.Style) {
 
 		}
 	}()
-}
-
-func (b *Bomb) killAnd(chan struct{}) {
-	time.Sleep(b.explodeIn)
-
 }
 
 func (b *Bomb) calculateDonePercent(verticalDirection VerticalDirection) {
