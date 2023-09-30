@@ -84,27 +84,25 @@ func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int
 
 	go func() {
 		for {
-			select {
-			case <-bombExploded:
+			<-bombExploded
 
-				var indexToRemove int = -1
+			var indexToRemove int = -1
 
-				for i, heroBomb := range h.bombs {
-					if heroBomb.bombId == bomb.bombId {
-						bomb.isDead = true
-						indexToRemove = i
-						break
-					}
+			for i, heroBomb := range h.bombs {
+				if heroBomb.bombId == bomb.bombId {
+					bomb.isDead = true
+					indexToRemove = i
+					break
 				}
-
-				if indexToRemove != -1 {
-					// Create a new slice without the element to remove
-					h.bombs = append(h.bombs[:indexToRemove], h.bombs[indexToRemove+1:]...)
-				}
-
-				explosionWaitGroup.Done()
-				explosionWaitGroup.Wait()
 			}
+
+			if indexToRemove != -1 {
+				// Create a new slice without the element to remove
+				h.bombs = append(h.bombs[:indexToRemove], h.bombs[indexToRemove+1:]...)
+			}
+
+			explosionWaitGroup.Done()
+			explosionWaitGroup.Wait()
 		}
 	}()
 
