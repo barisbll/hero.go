@@ -103,8 +103,6 @@ func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int
 
 	bomb.draw(s, style, ticker, bombExploded, explosionComplete, &explosionWaitGroup)
 
-	// TODO: use the waitGroups to be sure that each goroutine are not leaking
-
 	go func() {
 		for {
 			<-bombExploded
