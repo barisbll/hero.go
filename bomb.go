@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sync"
 	"time"
 
 	tcell "github.com/gdamore/tcell/v2"
@@ -101,14 +102,11 @@ func calculateFinalPosition(maxX, maxY, currentX, currentY, distanceX, distanceY
 	}
 }
 
-func (b *Bomb) draw(s tcell.Screen, style tcell.Style) {
-	ticker := time.NewTicker(20 * time.Millisecond)
-	bombExploded := make(chan struct{})
-	explosionComplete := make(chan struct{})
+func (b *Bomb) draw(s tcell.Screen, style tcell.Style, ticker *time.Ticker, bombExploded chan string, explosionComplete chan struct{}, explosionWaitGroup *sync.WaitGroup) {
 	go func() {
 		time.Sleep(b.explodeIn)
-		b.isDead = true
-		close(bombExploded)
+		bombExploded <- ""
+		bombExploded <- ""
 		time.Sleep(1 * time.Second)
 		close(explosionComplete)
 	}()
@@ -134,6 +132,8 @@ func (b *Bomb) draw(s tcell.Screen, style tcell.Style) {
 				s.SetContent(b.currentX, b.currentY, ExplosionEmoji, nil, style)
 				b.lastDrawnPosition.x = b.currentX
 				b.lastDrawnPosition.y = b.currentY
+				explosionWaitGroup.Done()
+				explosionWaitGroup.Wait()
 			case <-explosionComplete:
 				s.SetContent(b.currentX, b.currentY, ' ', nil, style)
 				s.Show()
