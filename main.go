@@ -26,6 +26,7 @@ func main() {
 	hero := Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false}
 
 	hero.draw(s, defStyle)
+	hero.spanNewEnemies(s, defStyle, xmax, ymax)
 
 	quit := func() {
 		// You have to catch panics in a defer, clean up, and
@@ -86,5 +87,6 @@ func main() {
 		}
 
 		hero.draw(s, defStyle)
+
 	}
 }

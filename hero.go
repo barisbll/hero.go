@@ -11,12 +11,14 @@ const HeroEmoji rune = '\U0001F9B8' // 🦸‍♂️
 const DeadEmoji rune = '\U0001F480' // 💀
 
 type Hero struct {
-	x             int
-	y             int
-	speed         uint8
-	bombs         []Bomb
-	bombIdCounter int
-	isDead        bool
+	x              int
+	y              int
+	speed          uint8
+	bombs          []Bomb
+	bombIdCounter  int
+	isDead         bool
+	enemies        []Enemy
+	enemyIdCounter int
 }
 
 func (h *Hero) goRight(maxWidth int) {
@@ -66,6 +68,14 @@ func (h *Hero) draw(s tcell.Screen, style tcell.Style) {
 	}
 
 	s.SetContent(h.x, h.y, HeroEmoji, nil, style)
+
+	for _, enemy := range h.enemies {
+		if enemy.isDead {
+			continue
+		}
+
+		s.SetContent(enemy.currentX, enemy.currentY, enemy.emoji, nil, style)
+	}
 }
 
 func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int) {
@@ -130,11 +140,11 @@ func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int
 
 }
 
-func (h *Hero) isNearBomb(bombX, bombY, actorX, actorY int) bool {
+func (h *Hero) isNearBomb(bombX, bombY, actorX, actorY, distance int) bool {
 	distanceX := makePositive(bombX - actorX)
 	distanceY := makePositive(bombY - actorY)
 
-	if distanceX <= 2 && distanceY <= 2 {
+	if distanceX <= distance && distanceY <= distance {
 		return true
 	}
 
@@ -142,10 +152,51 @@ func (h *Hero) isNearBomb(bombX, bombY, actorX, actorY int) bool {
 }
 
 func (h *Hero) killTheThingsInTheExplosionArea(s tcell.Screen, style tcell.Style, bombX, bombY int) {
-	if h.isNearBomb(bombX, bombY, h.x, h.y) {
+	if h.isNearBomb(bombX, bombY, h.x, h.y, 2) {
 		h.isDead = true
 		s.SetContent(h.x, h.y, DeadEmoji, nil, style)
 		s.Show()
+	}
+
+	var indexToRemove int = -1
+
+	// Todo: kill the enemies
+	for i, enemy := range h.enemies {
+
+		if h.isNearBomb(bombX, bombY, enemy.currentX, enemy.currentY, 5) {
+			enemy.isDead = true
+			s.SetContent(enemy.currentX, enemy.currentY, DeadEmoji, nil, style)
+			indexToRemove = i
+			s.Show()
+		}
+
+		if indexToRemove != -1 {
+			// Create a new slice without the element to remove
+			h.enemies = append(h.enemies[:indexToRemove], h.enemies[indexToRemove+1:]...)
+			indexToRemove = -1
+		}
+	}
+}
+
+func (h *Hero) spanNewEnemies(s tcell.Screen, style tcell.Style, maxWidth, maxHeight int) {
+	if h.isDead {
 		return
 	}
+
+	enemySpanTicker := time.NewTicker(2 * time.Second)
+	enemySpeedTicker := time.NewTicker(100 * time.Millisecond)
+
+	go func() {
+		for {
+			<-enemySpanTicker.C
+			// for testing purposes
+			if (len(h.enemies)) >= 1 {
+				continue
+			}
+			enemy := *NewEnemy(h.enemyIdCounter, maxWidth, maxHeight, h)
+			enemy.draw(s, style, enemySpeedTicker)
+			h.enemyIdCounter++
+			h.enemies = append(h.enemies, enemy)
+		}
+	}()
 }

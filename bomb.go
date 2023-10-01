@@ -104,10 +104,14 @@ func calculateFinalPosition(maxX, maxY, currentX, currentY, distanceX, distanceY
 
 func (b *Bomb) draw(s tcell.Screen, style tcell.Style, ticker *time.Ticker, bombExploded chan string, explosionComplete chan struct{}, explosionWaitGroup *sync.WaitGroup) {
 	go func() {
+		// wait until bomb explodes
 		time.Sleep(b.explodeIn)
+		// send two signal to the bombExploded channel to hero and bomb itself
 		bombExploded <- ""
 		bombExploded <- ""
+		// Make the explosion animation stay for a second
 		time.Sleep(1 * time.Second)
+		// Finish the explosion animation
 		close(explosionComplete)
 	}()
 
