@@ -14,10 +14,10 @@ type Hero struct {
 	x              int
 	y              int
 	speed          uint8
-	bombs          []Bomb
+	bombs          []*Bomb
 	bombIdCounter  int
 	isDead         bool
-	enemies        []Enemy
+	enemies        []*Enemy
 	enemyIdCounter int
 }
 
@@ -71,6 +71,7 @@ func (h *Hero) draw(s tcell.Screen, style tcell.Style) {
 
 	for _, enemy := range h.enemies {
 		if enemy.isDead {
+			s.SetContent(enemy.currentX, enemy.currentY, DeadEmoji, nil, style)
 			continue
 		}
 
@@ -102,7 +103,7 @@ func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int
 	}
 
 	h.bombIdCounter++
-	h.bombs = append(h.bombs, bomb)
+	h.bombs = append(h.bombs, &bomb)
 
 	ticker := time.NewTicker(20 * time.Millisecond)
 	bombExploded := make(chan string)
@@ -165,8 +166,8 @@ func (h *Hero) killTheThingsInTheExplosionArea(s tcell.Screen, style tcell.Style
 
 		if h.isNearBomb(bombX, bombY, enemy.currentX, enemy.currentY, 5) {
 			enemy.isDead = true
-			s.SetContent(enemy.currentX, enemy.currentY, DeadEmoji, nil, style)
 			indexToRemove = i
+			s.SetContent(enemy.currentX, enemy.currentY, DeadEmoji, nil, style)
 			s.Show()
 		}
 
@@ -184,19 +185,18 @@ func (h *Hero) spanNewEnemies(s tcell.Screen, style tcell.Style, maxWidth, maxHe
 	}
 
 	enemySpanTicker := time.NewTicker(2 * time.Second)
-	enemySpeedTicker := time.NewTicker(100 * time.Millisecond)
 
 	go func() {
 		for {
 			<-enemySpanTicker.C
-			// for testing purposes
-			if (len(h.enemies)) >= 1 {
+			if (len(h.enemies)) >= 2 {
 				continue
 			}
 			enemy := *NewEnemy(h.enemyIdCounter, maxWidth, maxHeight, h)
-			enemy.draw(s, style, enemySpeedTicker)
+			newEnemySpeedTicker := time.NewTicker(100 * time.Millisecond)
 			h.enemyIdCounter++
-			h.enemies = append(h.enemies, enemy)
+			h.enemies = append(h.enemies, &enemy)
+			enemy.draw(s, style, newEnemySpeedTicker)
 		}
 	}()
 }
