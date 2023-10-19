@@ -24,7 +24,7 @@ func main() {
 	s.Clear()
 	xmax, ymax := s.Size()
 
-	hero := Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false}
+	hero := Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false, enemyIdCounter: 0}
 
 	hero.draw(s, defStyle)
 	hero.spanNewEnemies(s, defStyle, xmax, ymax)

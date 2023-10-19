@@ -181,10 +181,19 @@ func (h *Hero) spanNewEnemies(s tcell.Screen, style tcell.Style, maxWidth, maxHe
 				continue
 			}
 			enemy := *NewEnemy(h.enemyIdCounter, maxWidth, maxHeight, h)
-			newEnemySpeedTicker := time.NewTicker(100 * time.Millisecond)
+			newEnemySpeedTicker := time.NewTicker(time.Duration(h.setGameSpeed()) * time.Millisecond)
 			h.enemyIdCounter++
 			h.enemies = append(h.enemies, &enemy)
 			enemy.draw(s, style, newEnemySpeedTicker)
 		}
 	}()
+}
+
+func (h *Hero) setGameSpeed() int {
+	if h.enemyIdCounter < 51 {
+		gameSpeed := 100 - int(h.enemyIdCounter)
+		return gameSpeed
+	}
+
+	return 50
 }
