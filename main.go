@@ -29,9 +29,6 @@ func main() {
 	hero.spanNewEnemies(s, defStyle, xmax, ymax)
 
 	quit := func() {
-		// You have to catch panics in a defer, clean up, and
-		// re-raise them - otherwise your application can
-		// die without leaving any diagnostic trace.
 		maybePanic := recover()
 		s.Fini()
 		if maybePanic != nil {
@@ -60,8 +57,13 @@ func main() {
 			} else if ev.Key() == tcell.KeyCtrlL {
 				s.Sync()
 			} else if ev.Rune() == 'R' || ev.Rune() == 'r' {
-				hero = Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false}
-				s.Clear()
+				if hero.isDead {
+					for _, enemy := range hero.enemies {
+						enemy.isDead = true
+					}
+					hero = Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false}
+					s.Clear()
+				}
 			} else if ev.Rune() == 'C' || ev.Rune() == 'c' {
 				s.Clear()
 			} else if ev.Key() == tcell.KeyRight || ev.Rune() == 'D' || ev.Rune() == 'd' {
