@@ -118,21 +118,9 @@ func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int
 		for {
 			<-bombExploded
 
-			var indexToRemove int = -1
-
-			for i, heroBomb := range h.bombs {
-				if heroBomb.bombId == bomb.bombId {
-					bomb.isDead = true
-					h.killTheThingsInTheExplosionArea(s, style, bomb.currentX, bomb.currentY)
-					indexToRemove = i
-					break
-				}
-			}
-
-			if indexToRemove != -1 {
-				// Create a new slice without the element to remove
-				h.bombs = append(h.bombs[:indexToRemove], h.bombs[indexToRemove+1:]...)
-			}
+			explodedBomb := h.bombs[0]
+			h.killTheThingsInTheExplosionArea(s, style, explodedBomb.currentX, explodedBomb.currentY)
+			explodedBomb.isDead = true
 
 			explosionWaitGroup.Done()
 			explosionWaitGroup.Wait()
@@ -160,8 +148,6 @@ func (h *Hero) killTheThingsInTheExplosionArea(s tcell.Screen, style tcell.Style
 	}
 
 	var indexToRemove int = -1
-
-	// Todo: kill the enemies
 	for i, enemy := range h.enemies {
 
 		if h.isNearBomb(bombX, bombY, enemy.currentX, enemy.currentY, 5) {
