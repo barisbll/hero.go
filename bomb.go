@@ -3,8 +3,6 @@ package main
 import (
 	"sync"
 	"time"
-
-	tcell "github.com/gdamore/tcell/v2"
 )
 
 type Direction string
@@ -103,7 +101,10 @@ func calculateFinalPosition(maxX, maxY, currentX, currentY, distanceX, distanceY
 	}
 }
 
-func (b *Bomb) draw(s tcell.Screen, style tcell.Style, ticker *time.Ticker, bombExploded chan string, explosionComplete chan struct{}, explosionWaitGroup *sync.WaitGroup) {
+func (b *Bomb) draw(ticker *time.Ticker, bombExploded chan string, explosionComplete chan struct{}, explosionWaitGroup *sync.WaitGroup) {
+	s := *b.hero.settings.screen
+	style := *b.hero.settings.theme
+
 	go func() {
 		// wait until bomb explodes
 		time.Sleep(b.explodeIn)

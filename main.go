@@ -18,20 +18,21 @@ func main() {
 	if err := s.Init(); err != nil {
 		log.Fatalf("%+v", err)
 	}
-	s.SetStyle(defStyle)
-	s.EnableMouse()
-	s.EnablePaste()
-	s.Clear()
-	xmax, ymax := s.Size()
+	settings := NewSettings(&s, &defStyle)
 
-	hero := Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false, enemyIdCounter: 24}
+	(*settings.screen).SetStyle(defStyle)
+	(*settings.screen).EnableMouse()
+	(*settings.screen).EnablePaste()
+	(*settings.screen).Clear()
 
-	hero.draw(s, defStyle)
-	hero.spanNewEnemies(s, defStyle, xmax, ymax)
+	hero := NewHero(settings)
+
+	hero.draw()
+	hero.spanNewEnemies(s, defStyle, settings.xMax, settings.yMax)
 
 	quit := func() {
 		maybePanic := recover()
-		s.Fini()
+		(*settings.screen).Fini()
 		if maybePanic != nil {
 			fmt.Println(maybePanic)
 			// panic(maybePanic)
@@ -42,16 +43,18 @@ func main() {
 	// Event loop
 	for {
 		// Update screen
-		s.Show()
+		(*settings.screen).Show()
 
 		// Poll event
-		ev := s.PollEvent()
+		ev := (*settings.screen).PollEvent()
 
 		// Process event
 		switch ev := ev.(type) {
 		case *tcell.EventResize:
-			s.Sync()
-			xmax, ymax = s.Size()
+			(*settings.screen).Sync()
+			xmax, ymax := (*settings.screen).Size()
+			settings.xMax = xmax
+			settings.yMax = ymax
 		case *tcell.EventKey:
 			// System logic keys
 			if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC {
@@ -63,36 +66,32 @@ func main() {
 					for _, enemy := range hero.enemies {
 						enemy.isDead = true
 					}
-					hero = Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false, enemyIdCounter: 24}
-					s.Clear()
+					hero = NewHero(settings)
+					(*settings.screen).Clear()
 				}
 			} else if ev.Rune() == 'P' || ev.Rune() == 'p' {
 				hero.isPaused = !hero.isPaused
 			} else if ev.Rune() == 'C' || ev.Rune() == 'c' {
-				s.Clear()
+				(*settings.screen).Clear()
 			} else if ev.Key() == tcell.KeyRight || ev.Rune() == 'D' || ev.Rune() == 'd' {
-				hero.goRight(xmax)
-				s.Clear()
+				hero.goRight()
 			} else if ev.Key() == tcell.KeyLeft || ev.Rune() == 'A' || ev.Rune() == 'a' {
 				hero.goLeft()
-				s.Clear()
 			} else if ev.Key() == tcell.KeyUp || ev.Rune() == 'W' || ev.Rune() == 'w' {
 				hero.goUp()
-				s.Clear()
 			} else if ev.Key() == tcell.KeyDown || ev.Rune() == 'S' || ev.Rune() == 's' {
-				hero.goDown(ymax)
-				s.Clear()
+				hero.goDown()
 			}
 		case *tcell.EventMouse:
 			clickedX, clickedY := ev.Position()
 
 			switch ev.Buttons() {
 			case tcell.Button1, tcell.Button2:
-				hero.addBomb(s, defStyle, clickedX, clickedY)
+				hero.addBomb(clickedX, clickedY)
 			}
 		}
 
-		hero.draw(s, defStyle)
+		hero.draw()
 
 	}
 }

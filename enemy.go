@@ -3,8 +3,6 @@ package main
 import (
 	"math/rand"
 	"time"
-
-	tcell "github.com/gdamore/tcell/v2"
 )
 
 var enemyEmojis = []rune{'👹', '👾', '👽', '👻', '🤡'}
@@ -96,7 +94,10 @@ func (e *Enemy) move() {
 
 }
 
-func (e *Enemy) draw(s tcell.Screen, style tcell.Style, ticker *time.Ticker) {
+func (e *Enemy) draw(ticker *time.Ticker) {
+	s := *e.hero.settings.screen
+	style := *e.hero.settings.theme
+
 	go func() {
 		for {
 			select {

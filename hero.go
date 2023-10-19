@@ -20,16 +20,30 @@ type Hero struct {
 	enemies        []*Enemy
 	enemyIdCounter int
 	isPaused       bool
+	settings       *Settings
 }
 
-func (h *Hero) goRight(maxWidth int) {
+func NewHero(settings *Settings) *Hero {
+	return &Hero{
+		x:              settings.xMax / 2,
+		y:              settings.yMax / 2,
+		speed:          1,
+		isDead:         false,
+		enemyIdCounter: 24,
+		settings:       settings,
+	}
+}
+
+func (h *Hero) goRight() {
 	if h.isDead || h.isPaused {
 		return
 	}
 
-	if h.x < maxWidth-2 {
+	if h.x < h.settings.xMax-2 {
 		h.x += int(h.speed)
 	}
+
+	(*h.settings.screen).Clear()
 }
 
 func (h *Hero) goLeft() {
@@ -40,6 +54,8 @@ func (h *Hero) goLeft() {
 	if h.x > 0 {
 		h.x -= int(h.speed)
 	}
+
+	(*h.settings.screen).Clear()
 }
 
 func (h *Hero) goUp() {
@@ -50,37 +66,43 @@ func (h *Hero) goUp() {
 	if h.y > 0 {
 		h.y -= int(h.speed)
 	}
+
+	(*h.settings.screen).Clear()
 }
 
-func (h *Hero) goDown(maxHeight int) {
+func (h *Hero) goDown() {
 	if h.isDead || h.isPaused {
 		return
 	}
 
-	if h.y < maxHeight-1 {
+	if h.y < h.settings.yMax-1 {
 		h.y += int(h.speed)
 	}
+
+	(*h.settings.screen).Clear()
 }
 
-func (h *Hero) draw(s tcell.Screen, style tcell.Style) {
+func (h *Hero) draw() {
+	screen := *h.settings.screen
+	style := *h.settings.theme
 	if h.isDead {
-		s.SetContent(h.x, h.y, DeadEmoji, nil, style)
+		screen.SetContent(h.x, h.y, DeadEmoji, nil, style)
 		return
 	}
 
-	s.SetContent(h.x, h.y, HeroEmoji, nil, style)
+	screen.SetContent(h.x, h.y, HeroEmoji, nil, style)
 
 	for _, enemy := range h.enemies {
 		if enemy.isDead {
-			s.SetContent(enemy.currentX, enemy.currentY, DeadEmoji, nil, style)
+			screen.SetContent(enemy.currentX, enemy.currentY, DeadEmoji, nil, style)
 			continue
 		}
 
-		s.SetContent(enemy.currentX, enemy.currentY, enemy.emoji, nil, style)
+		screen.SetContent(enemy.currentX, enemy.currentY, enemy.emoji, nil, style)
 	}
 }
 
-func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int) {
+func (h *Hero) addBomb(clickedX, clickedY int) {
 	if len(h.bombs) >= 5 || h.isDead || h.isPaused {
 		return
 	}
@@ -114,14 +136,14 @@ func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int
 	var explosionWaitGroup sync.WaitGroup
 	explosionWaitGroup.Add(2)
 
-	bomb.draw(s, style, ticker, bombExploded, explosionComplete, &explosionWaitGroup)
+	bomb.draw(ticker, bombExploded, explosionComplete, &explosionWaitGroup)
 
 	go func() {
 		for {
 			<-bombExploded
 
 			explodedBomb := h.bombs[0]
-			h.killTheThingsInTheExplosionArea(s, style, explodedBomb.currentX, explodedBomb.currentY)
+			h.killTheThingsInTheExplosionArea(explodedBomb.currentX, explodedBomb.currentY)
 			explodedBomb.isDead = true
 			h.bombs = h.bombs[1:]
 
@@ -152,11 +174,11 @@ func (h *Hero) removeIndexFromEnemySlice(idx int) {
 	}
 }
 
-func (h *Hero) killTheThingsInTheExplosionArea(s tcell.Screen, style tcell.Style, bombX, bombY int) {
+func (h *Hero) killTheThingsInTheExplosionArea(bombX, bombY int) {
 	if h.isNearBomb(bombX, bombY, h.x, h.y, 2) {
 		h.isDead = true
-		s.SetContent(h.x, h.y, DeadEmoji, nil, style)
-		s.Show()
+		(*h.settings.screen).SetContent(h.x, h.y, DeadEmoji, nil, *h.settings.theme)
+		(*h.settings.screen).Show()
 	}
 
 	indexToRemove := []int{}
@@ -164,8 +186,8 @@ func (h *Hero) killTheThingsInTheExplosionArea(s tcell.Screen, style tcell.Style
 		if h.isNearBomb(bombX, bombY, enemy.currentX, enemy.currentY, 5) {
 			enemy.isDead = true
 			indexToRemove = append(indexToRemove, enemy.id)
-			s.SetContent(enemy.currentX, enemy.currentY, DeadEmoji, nil, style)
-			s.Show()
+			(*h.settings.screen).SetContent(enemy.currentX, enemy.currentY, DeadEmoji, nil, *h.settings.theme)
+			(*h.settings.screen).Show()
 		}
 	}
 
@@ -191,7 +213,7 @@ func (h *Hero) spanNewEnemies(s tcell.Screen, style tcell.Style, maxWidth, maxHe
 			newEnemySpeedTicker := time.NewTicker(time.Duration(h.getGameSpeed()) * time.Millisecond)
 			h.enemyIdCounter++
 			h.enemies = append(h.enemies, &enemy)
-			enemy.draw(s, style, newEnemySpeedTicker)
+			enemy.draw(newEnemySpeedTicker)
 		}
 	}()
 }
