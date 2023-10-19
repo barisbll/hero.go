@@ -121,6 +121,7 @@ func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int
 			explodedBomb := h.bombs[0]
 			h.killTheThingsInTheExplosionArea(s, style, explodedBomb.currentX, explodedBomb.currentY)
 			explodedBomb.isDead = true
+			h.bombs = h.bombs[1:]
 
 			explosionWaitGroup.Done()
 			explosionWaitGroup.Wait()
@@ -140,6 +141,10 @@ func (h *Hero) isNearBomb(bombX, bombY, actorX, actorY, distance int) bool {
 	return false
 }
 
+func (h *Hero) removeIndexFromEnemySlice(idx int) {
+	h.enemies = append(h.enemies[:idx], h.enemies[idx+1:]...)
+}
+
 func (h *Hero) killTheThingsInTheExplosionArea(s tcell.Screen, style tcell.Style, bombX, bombY int) {
 	if h.isNearBomb(bombX, bombY, h.x, h.y, 2) {
 		h.isDead = true
@@ -147,21 +152,18 @@ func (h *Hero) killTheThingsInTheExplosionArea(s tcell.Screen, style tcell.Style
 		s.Show()
 	}
 
-	var indexToRemove int = -1
+	indexToRemove := []int{}
 	for i, enemy := range h.enemies {
-
 		if h.isNearBomb(bombX, bombY, enemy.currentX, enemy.currentY, 5) {
 			enemy.isDead = true
-			indexToRemove = i
+			indexToRemove = append(indexToRemove, i)
 			s.SetContent(enemy.currentX, enemy.currentY, DeadEmoji, nil, style)
 			s.Show()
 		}
+	}
 
-		if indexToRemove != -1 {
-			// Create a new slice without the element to remove
-			h.enemies = append(h.enemies[:indexToRemove], h.enemies[indexToRemove+1:]...)
-			indexToRemove = -1
-		}
+	for i := 0; i < len(indexToRemove); i++ {
+		h.removeIndexFromEnemySlice(indexToRemove[i])
 	}
 }
 

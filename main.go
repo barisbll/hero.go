@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	tcell "github.com/gdamore/tcell/v2"
@@ -32,7 +33,8 @@ func main() {
 		maybePanic := recover()
 		s.Fini()
 		if maybePanic != nil {
-			panic(maybePanic)
+			fmt.Println(maybePanic)
+			// panic(maybePanic)
 		}
 	}
 	defer quit()

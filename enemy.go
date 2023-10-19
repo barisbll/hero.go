@@ -58,10 +58,22 @@ func (e *Enemy) move() {
 		return
 	}
 
+	isEnemyZombie := true
+	for _, enemy := range e.hero.enemies {
+		if enemy.id == e.id {
+			isEnemyZombie = false
+			break
+		}
+	}
+
+	if isEnemyZombie {
+		e.isDead = true
+		return
+	}
+
 	if e.currentX == e.hero.x && e.currentY == e.hero.y {
 		e.isDead = true
 		e.hero.isDead = true
-		return
 	}
 
 	xDifference := makePositive(e.currentX - e.hero.x)
