@@ -19,10 +19,11 @@ type Hero struct {
 	isDead         bool
 	enemies        []*Enemy
 	enemyIdCounter int
+	isPaused       bool
 }
 
 func (h *Hero) goRight(maxWidth int) {
-	if h.isDead {
+	if h.isDead || h.isPaused {
 		return
 	}
 
@@ -32,7 +33,7 @@ func (h *Hero) goRight(maxWidth int) {
 }
 
 func (h *Hero) goLeft() {
-	if h.isDead {
+	if h.isDead || h.isPaused {
 		return
 	}
 
@@ -42,7 +43,7 @@ func (h *Hero) goLeft() {
 }
 
 func (h *Hero) goUp() {
-	if h.isDead {
+	if h.isDead || h.isPaused {
 		return
 	}
 
@@ -52,7 +53,7 @@ func (h *Hero) goUp() {
 }
 
 func (h *Hero) goDown(maxHeight int) {
-	if h.isDead {
+	if h.isDead || h.isPaused {
 		return
 	}
 
@@ -80,7 +81,7 @@ func (h *Hero) draw(s tcell.Screen, style tcell.Style) {
 }
 
 func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int) {
-	if len(h.bombs) >= 5 || h.isDead {
+	if len(h.bombs) >= 5 || h.isDead || h.isPaused {
 		return
 	}
 
@@ -100,6 +101,7 @@ func (h *Hero) addBomb(s tcell.Screen, style tcell.Style, clickedX, clickedY int
 		finalY:    finalY,
 		explodeIn: time.Second * 1,
 		isDead:    false,
+		hero:      h,
 	}
 
 	h.bombIdCounter++

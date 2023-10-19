@@ -50,6 +50,7 @@ type Bomb struct {
 	lastDrawnPosition Coordinates
 	explodeIn         time.Duration
 	isDead            bool
+	hero              *Hero
 
 	speed uint
 }
@@ -119,6 +120,9 @@ func (b *Bomb) draw(s tcell.Screen, style tcell.Style, ticker *time.Ticker, bomb
 		for {
 			select {
 			case <-ticker.C:
+				if b.hero.isPaused {
+					close(explosionComplete)
+				}
 				if b.lastDrawnPosition.x != 0 && b.lastDrawnPosition.y != 0 {
 					s.SetContent(b.lastDrawnPosition.x, b.lastDrawnPosition.y, ' ', nil, style)
 				}

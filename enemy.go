@@ -54,7 +54,7 @@ func NewEnemy(id, maxWidth, maxHeight int, hero *Hero) *Enemy {
 }
 
 func (e *Enemy) move() {
-	if e.isDead || e.hero.isDead {
+	if e.isDead || e.hero.isDead || e.hero.isPaused {
 		return
 	}
 

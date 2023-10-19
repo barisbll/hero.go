@@ -63,9 +63,11 @@ func main() {
 					for _, enemy := range hero.enemies {
 						enemy.isDead = true
 					}
-					hero = Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false}
+					hero = Hero{x: xmax / 2, y: ymax / 2, speed: 1, isDead: false, enemyIdCounter: 24}
 					s.Clear()
 				}
+			} else if ev.Rune() == 'P' || ev.Rune() == 'p' {
+				hero.isPaused = !hero.isPaused
 			} else if ev.Rune() == 'C' || ev.Rune() == 'c' {
 				s.Clear()
 			} else if ev.Key() == tcell.KeyRight || ev.Rune() == 'D' || ev.Rune() == 'd' {
