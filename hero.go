@@ -142,7 +142,12 @@ func (h *Hero) isNearBomb(bombX, bombY, actorX, actorY, distance int) bool {
 }
 
 func (h *Hero) removeIndexFromEnemySlice(idx int) {
-	h.enemies = append(h.enemies[:idx], h.enemies[idx+1:]...)
+	for i, enemy := range h.enemies {
+		if enemy.id == idx {
+			h.enemies = append(h.enemies[:i], h.enemies[i+1:]...)
+			break
+		}
+	}
 }
 
 func (h *Hero) killTheThingsInTheExplosionArea(s tcell.Screen, style tcell.Style, bombX, bombY int) {
@@ -153,10 +158,10 @@ func (h *Hero) killTheThingsInTheExplosionArea(s tcell.Screen, style tcell.Style
 	}
 
 	indexToRemove := []int{}
-	for i, enemy := range h.enemies {
+	for _, enemy := range h.enemies {
 		if h.isNearBomb(bombX, bombY, enemy.currentX, enemy.currentY, 5) {
 			enemy.isDead = true
-			indexToRemove = append(indexToRemove, i)
+			indexToRemove = append(indexToRemove, enemy.id)
 			s.SetContent(enemy.currentX, enemy.currentY, DeadEmoji, nil, style)
 			s.Show()
 		}
