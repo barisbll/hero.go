@@ -104,6 +104,7 @@ func calculateFinalPosition(maxX, maxY, currentX, currentY, distanceX, distanceY
 func (b *Bomb) draw(ticker *time.Ticker, bombExploded chan string, explosionComplete chan struct{}, explosionWaitGroup *sync.WaitGroup) {
 	s := *b.hero.settings.screen
 	style := *b.hero.settings.theme
+	isExplosionCompleteChannelClosed := false
 
 	go func() {
 		// wait until bomb explodes
@@ -114,14 +115,16 @@ func (b *Bomb) draw(ticker *time.Ticker, bombExploded chan string, explosionComp
 		// Make the explosion animation stay for a second
 		time.Sleep(1 * time.Second)
 		// Finish the explosion animation
-		close(explosionComplete)
+		if !isExplosionCompleteChannelClosed {
+			close(explosionComplete)
+		}
 	}()
 
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
-				if b.hero.isPaused {
+				if b.hero.isPaused && !isExplosionCompleteChannelClosed {
 					close(explosionComplete)
 				}
 				if b.lastDrawnPosition.x != 0 && b.lastDrawnPosition.y != 0 {
@@ -144,6 +147,7 @@ func (b *Bomb) draw(ticker *time.Ticker, bombExploded chan string, explosionComp
 				explosionWaitGroup.Done()
 				explosionWaitGroup.Wait()
 			case <-explosionComplete:
+				isExplosionCompleteChannelClosed = true
 				s.SetContent(b.currentX, b.currentY, ' ', nil, style)
 				s.Show()
 				ticker.Stop()

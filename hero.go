@@ -3,8 +3,6 @@ package main
 import (
 	"sync"
 	"time"
-
-	tcell "github.com/gdamore/tcell/v2"
 )
 
 const HeroEmoji rune = '\U0001F9B8' // 🦸‍♂️
@@ -24,7 +22,7 @@ type Hero struct {
 }
 
 func NewHero(settings *Settings) *Hero {
-	return &Hero{
+	hero := &Hero{
 		x:              settings.xMax / 2,
 		y:              settings.yMax / 2,
 		speed:          1,
@@ -32,6 +30,10 @@ func NewHero(settings *Settings) *Hero {
 		enemyIdCounter: 24,
 		settings:       settings,
 	}
+
+	hero.spanNewEnemies()
+	hero.draw()
+	return hero
 }
 
 func (h *Hero) goRight() {
@@ -196,10 +198,13 @@ func (h *Hero) killTheThingsInTheExplosionArea(bombX, bombY int) {
 	}
 }
 
-func (h *Hero) spanNewEnemies(s tcell.Screen, style tcell.Style, maxWidth, maxHeight int) {
+func (h *Hero) spanNewEnemies() {
 	if h.isDead {
 		return
 	}
+
+	xMax := h.settings.xMax
+	yMax := h.settings.yMax
 
 	enemySpanTicker := time.NewTicker(2 * time.Second)
 
@@ -209,7 +214,7 @@ func (h *Hero) spanNewEnemies(s tcell.Screen, style tcell.Style, maxWidth, maxHe
 			if (len(h.enemies)) >= h.getEnemyQuantity() {
 				continue
 			}
-			enemy := *NewEnemy(h.enemyIdCounter, maxWidth, maxHeight, h)
+			enemy := *NewEnemy(h.enemyIdCounter, xMax, yMax, h)
 			newEnemySpeedTicker := time.NewTicker(time.Duration(h.getGameSpeed()) * time.Millisecond)
 			h.enemyIdCounter++
 			h.enemies = append(h.enemies, &enemy)

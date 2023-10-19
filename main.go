@@ -26,9 +26,7 @@ func main() {
 	(*settings.screen).Clear()
 
 	hero := NewHero(settings)
-
-	hero.draw()
-	hero.spanNewEnemies(s, defStyle, settings.xMax, settings.yMax)
+	menu := NewMenu(settings, hero)
 
 	quit := func() {
 		maybePanic := recover()
@@ -67,10 +65,17 @@ func main() {
 						enemy.isDead = true
 					}
 					hero = NewHero(settings)
+					menu.hero = hero
 					(*settings.screen).Clear()
 				}
 			} else if ev.Rune() == 'P' || ev.Rune() == 'p' {
 				hero.isPaused = !hero.isPaused
+				if hero.isPaused {
+					menu.drawPause()
+				} else {
+					menu.clearPause()
+				}
+
 			} else if ev.Rune() == 'C' || ev.Rune() == 'c' {
 				(*settings.screen).Clear()
 			} else if ev.Key() == tcell.KeyRight || ev.Rune() == 'D' || ev.Rune() == 'd' {
@@ -92,6 +97,6 @@ func main() {
 		}
 
 		hero.draw()
-
+		menu.drawScore()
 	}
 }
