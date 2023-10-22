@@ -211,7 +211,7 @@ func (h *Hero) spanNewEnemies() {
 	go func() {
 		for {
 			<-enemySpanTicker.C
-			if (len(h.enemies)) >= h.getEnemyQuantity() {
+			if (len(h.enemies)) >= h.getEnemyQuantity() || h.isDead {
 				continue
 			}
 			enemy := *NewEnemy(h.enemyIdCounter, xMax, yMax, h)

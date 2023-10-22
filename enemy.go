@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var enemyEmojis = []rune{'👹', '👾', '👽', '👻', '🤡'}
+var enemyEmojis = []rune{'👹', '🐉', '👽', '👻', '🤡'}
 
 func giveRandomEnemyEmoji() rune {
 	return enemyEmojis[rand.Intn(len(enemyEmojis))]
