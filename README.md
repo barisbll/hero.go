@@ -1,19 +1,19 @@
 # hero.go
-A first person shooter game on console, built with Go 💙
+A 2d terminal game to kill monsters and have fun! Built with Go 💙
 
-To play it clone the project
-```bash
-git clone <project-hash>
-```
+# How to Install?
 
-To build and run go
-```go
-go run .
-```
+To install the game you need to go to the [releases page](https://github.com/barisbll/hero.go/tags), find the newest release (currently v1.0.2), and install it based on your operating system and CPU.
+After installing it, just run the executable file by double-clicking, your OS may warn you of an unknown resource, but this is only because you just downloaded a binary from the web.
 
-And enjoy the game 😊
+# How to Play?
 
-![hero go](https://github.com/barisbll/hero.go/assets/40062673/6bdcac5d-2685-4401-aab4-249d23b7aa46)
+Move your character with W-A-S-D, if you hold the character it goes in that direction, you can shoot monsters with mouse clicks.
+Pause the game with P and when you die restart it with R.
+
+Enjoy killing monsters!
+
+https://github.com/barisbll/hero.go/assets/40062673/240d7606-b471-4aa1-8c54-4379a513122b
 
 
 
